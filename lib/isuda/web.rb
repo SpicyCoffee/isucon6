@@ -141,7 +141,7 @@ module Isuda
       page = (params[:page] || 1).to_i
 
       entries = db.xquery(%|
-        SELECT *, count(*) as total_count FROM entry
+        SELECT * FROM entry
         ORDER BY updated_at DESC
         LIMIT #{per_page}
         OFFSET #{per_page * (page - 1)}
@@ -151,7 +151,7 @@ module Isuda
         entry[:stars] = load_stars(entry[:keyword])
       end
 
-      total_entries = entries.first[:total_count]
+      total_entries = db.xquery(%| SELECT count(*) AS total_entries FROM entry |).first[:total_entries].to_i
 
       last_page = (total_entries.to_f / per_page.to_f).ceil
       from = [1, page - 5].max
